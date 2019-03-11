@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>第十一届绍兴文理学院元培学院程序设计竞赛报名</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		<!--<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"/>-->
+
+	</head>
+
+	<body>
+		<div class="wrap flex-c-c" style="position: relative;">
+			<ul class="select__list">
+				<li id="login" class="select__label select__label--active">第十一届绍兴文理学院元培学院程序设计竞赛报名</li>
+			</ul>
+			<span class="pointer" style="right: 0em !important;"></span>
+			<input type="text" placeholder="姓名" class="ui-field " id="username" />
+			<td>
+				<select id="usersex" class="ui-field" style="width: 25rem;margin:0;padding: 0 0 0 10.5rem;">
+					<!下拉框控件>
+					<option style="text-align:center;" value="性别">性别</option>
+					<option style="text-align:center;" value="男">男</option>
+					<option style="text-align:center;" value="女">女</option>
+				</select>
+			</td>
+			<input type="text" placeholder="班级" class="ui-field" id="userclass" />
+			
+			<input type="text" placeholder="ypoj账号" class="ui-field" id="useroj" />
+			<input type="text" placeholder="有效联系方式（长短号）" class="ui-field" id="phone" />
+			<button id="btn" class="ui-button">报名</button>
+			<hr />
+		</div>
+		<div class="container">
+			<div class="row">
+
+					<div style="display: block;margin-left: 20px;">
+						<span style="font-weight:bolder;color: white;">当前总人数：</span><span style="font-weight:bolder;color: white;" class="all_num"></span>
+					</div>
+
+				<div class="col-md-12" style="padding:2em 0;margin-top: -20px;margin-left: 20px;margin-right: 20px;">
+					<div class="table-responsive">
+						<table class="table table-bordered table-striped" id="test_table">
+							<thead>
+								<tr style="background: #C1CDCD !important;text-align: center;">
+									<td>姓名</td>
+									<td>性别</td>
+									<td>班级</td>
+									<td>ypoj账号</td>
+									<td>联系方式</td>
+								</tr>
+							</thead>
+							<tbody class="page" >
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer" style="">
+			©绍兴文理学院元培学院ACM实验室
+		</div>
+
+		<script type="text/javascript" src="js/castapp.js"></script>
+		<script type="text/javascript" src="js/mui.js"></script>
+		<script type="text/javascript">
+			var btn = document.getElementById('btn');
+			btn.addEventListener('click', function() {
+				//alert(1);
+				var username = document.getElementById('username');
+				var usersex = document.getElementById('usersex');
+				var userclass = document.getElementById('userclass');
+				var useroj = document.getElementById('useroj');
+				var phone = document.getElementById('phone');
+				//alert(usersex.value);
+				if(username.value == '') {
+					alert('请输入姓名');
+				} else if(usersex.value == '性别') {
+					alert('请选择性别');
+				} else if(useroj.value == '') {
+					alert('请输入ypoj账号');
+				} else if(phone.value == '') {
+					alert('请输入联系方式');
+				} else if(userclass.value == ''){
+					alert("请输入班级");
+				}else {
+					$.ajax({
+						type: "get",
+						dataType: "text",
+						url: "http://182.254.155.100/ypacm/index.php/User/ypacm_baoming",
+						data: {
+							username_data: username.value,
+							usersex_data: usersex.value,
+							userclass_data:userclass.value,
+							useroj_data: useroj.value,
+							phone_data: phone.value
+
+						},
+						async: true,
+						success: function(data) {
+							//alert(data);
+							if(data == -1) {
+								alert('该oj账号已经报名过,请勿重新报名');
+							} else if(data > 0) {
+								alert('报名成功');
+								window.location.reload();
+							} else {
+								alert('报名失败，请联系管理员');
+							}
+						}
+					});
+				}
+			});
+			
+			
+			var page = document.getElementsByClassName('page');
+			$.ajax({
+				type: "get",
+				url: "http://182.254.155.100/ypacm/index.php/User/user_show",
+				data: {},
+				async: true,
+				dataType: "text",
+				success: function(data) {
+					
+					//console.log(data);
+					//data = data.replaceAll(""+(char)65279,"")
+
+					//console.log(data.charCodeAt(0)+","+data.charCodeAt(1)+","+data.charCodeAt(2));
+					//data = data.substring(1); 
+					//console.log(data);
+					json = JSON.parse(data);
+					for(var a in json){
+						var phone = json[a].phone;
+						var phone_hide = phone.replace()
+						var j = phone.substring(3,7);
+						var phone_hide = phone.replace(j,'****');
+						page[0].innerHTML+='<tr>'
+							+		'<td>'
+							+			'<span>' + json[a].username +'</span>'
+							+		'</td>'
+							+		'<td>'
+							+			'<span>' +json[a].usersex +'</span>'
+							+		'</td>'
+							+		'<td>'
+							+			'<span>' +json[a].userclass +'</span>'
+							+		'</td>'
+							+		'<td>'
+							+			'<span>' + json[a].useroj +'</span>'
+							+		'</td>'
+							+		'<td>'
+							+			'<span>' +phone_hide +'</span>'
+							+		'</td>'
+							+	'</tr>';
+					}
+				}
+			});
+			
+			var all_num = document.getElementsByClassName('all_num');
+			$.ajax({
+				type: "get",
+				url: "http://182.254.155.100/ypacm/index.php/User/user_num",
+				data: {},
+				async: true,
+				dataType: "text",
+				success: function(data) {
+					//alert(data);
+					all_num[0].innerHTML = data;
+					
+				}
+			});
+			
+			
+		</script>
+	</body>
+
+</html>
